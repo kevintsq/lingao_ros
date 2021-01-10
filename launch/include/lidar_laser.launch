@@ -1,0 +1,12 @@
+<launch>
+    <!-- Arguments -->
+    <arg name="lidar" default="$(env LINGAO_LIDAR)" doc="model type [rplidar, ydlidar, hokuyo]"/>
+
+    <!-- Run lingao compatible laser drivers. -->
+    <include file="$(find lingao_bringup)/launch/include/lidar/$(arg lidar).launch" />
+
+    <!-- Publish static transform of the laser. Define your sensor offset here -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_laser" args="0.04 0 0.138 3.1415 0 0  /base_link /laser"/>
+</launch>
+
+

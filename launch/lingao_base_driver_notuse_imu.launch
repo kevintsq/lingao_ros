@@ -1,0 +1,15 @@
+<launch>
+    <!-- lingao base_driver -->
+    <node pkg="lingao_bringup" name="lingao_base_node" type="lingao_base_node" output="screen">
+          <param name="port" value="/dev/lingao"/>
+          <param name="baud" value="230400"/>
+          <param name="freq" value="50" />
+          <param name="cmd_vel_sub_timeout" value="1" />
+          <param name="publish_odom" value="false" />
+          <param name="imu_used" value="false" />
+          <param name="linear_scale" value="1" />
+          <param name="angular_scale" value="1" />
+    </node>
+
+
+</launch>
