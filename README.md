@@ -21,7 +21,7 @@
     ```
     git clone https://e.coding.net/keaa/lingaoros/lingao_msgs.git
     git clone https://e.coding.net/keaa/lingaoros/imu_calib.git
-    git clone https://e.coding.net/keaa/lingaoros_pro/lingao_bringup.git
+    git clone https://e.coding.net/keaa/lingaoros/lingao_bringup.git
     ```
 
 ## 2.导入设备识别符
