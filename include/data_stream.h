@@ -29,6 +29,7 @@ public:
     
     void rxdata_parsing(vecBuff newdata);
     bool get_Message(Message_Id_Enum msgId, int timeoutMs = 50);
+    void update_liner_speed(Data_Format_Liner linertx);
     
     bool msg_Transmit(Message_Id_Enum msgId);
     bool msg_Transmit(MessageFormat_st msgf);

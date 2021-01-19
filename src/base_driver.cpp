@@ -156,7 +156,7 @@ void Base_Driver::update_liner_speed()
   static Data_Format_Liner linertx;
   linertx.EndianSwapSet(&liner_tx_);
 
-  stream->msg_Transmit(MSG_ID_SET_VELOCITY, (unsigned char*)&linertx, sizeof(Data_Format_Liner));
+  stream->update_liner_speed(linertx);
 }
 
 void Base_Driver::base_Loop()
@@ -180,8 +180,6 @@ void Base_Driver::base_Loop()
       bat_msg.voltage = rxData_battery.bat_voltage;
       bat_msg.percentage = rxData_battery.bat_percentage;
       pub_bat_.publish(bat_msg);
-
-      // loop_rate.sleep();
     }
     else ROS_WARN_STREAM("Get VOLTAGE Data Time Out!");
 
@@ -194,9 +192,6 @@ void Base_Driver::base_Loop()
           publish_imu();
         }
         else ROS_WARN_STREAM("Get IMU Data Time Out!");
-
-        // control MastBoard mast wait for 10ms
-        // loop_rate.sleep();
     }
 
     isRead = stream->get_Message(MSG_ID_GET_VELOCITY);
@@ -213,12 +208,8 @@ void Base_Driver::base_Loop()
       publish_odom();
     }
     else ROS_WARN_STREAM("Get VELOCITY Data Time Out!");
-    
-    // control MastBoard mast wait for 10ms
-    // loop_rate.sleep();
 
     update_liner_speed();
-    usleep(600);
 
     ros::spinOnce();
     loop_rate.sleep();  // 等待loop_rate設定的時間
