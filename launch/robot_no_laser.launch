@@ -1,0 +1,9 @@
+<launch>
+
+    <!-- Start lingao bringup and IMU Filter -->
+    <include file="$(find lingao_bringup)/launch/bringup.launch" />
+
+    <include file="$(find lingao_description)/launch/model.launch"/>
+    
+
+</launch>
