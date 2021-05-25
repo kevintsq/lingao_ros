@@ -280,14 +280,14 @@ void Base_Driver::publish_odom()
   odom_msg.pose.pose.orientation.w = odom_quat.w();
 
   //编码器的线速度
-  odom_msg.twist.twist.linear.x = liner_rx_.v_liner_x;
-  odom_msg.twist.twist.linear.y = liner_rx_.v_liner_y;
+  odom_msg.twist.twist.linear.x = liner_rx_.v_liner_x  * linear_scale_;
+  odom_msg.twist.twist.linear.y = liner_rx_.v_liner_y  * linear_scale_;
   odom_msg.twist.twist.linear.z = 0.0;
 
   //编码器的角速度
   odom_msg.twist.twist.angular.x = 0.0;
   odom_msg.twist.twist.angular.y = 0.0;
-  odom_msg.twist.twist.angular.z = liner_rx_.v_angular_z;
+  odom_msg.twist.twist.angular.z = liner_rx_.v_angular_z * angular_scale_;
 
   pub_odom_.publish(odom_msg);
 }
