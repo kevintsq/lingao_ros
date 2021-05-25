@@ -13,7 +13,14 @@
 
 1. 安装关联ROS包
 
-    tf2 tf2-ros roslint robot-localization
+    ``` linux
+    sudo apt-get install -y \
+    ros-ROS_DISTRO-roslint \
+    ros-ROS_DISTRO-robot-localization \
+    ros-ROS_DISTRO-tf2 \
+    ros-ROS_DISTRO-tf2-ros \
+    ros-ROS_DISTRO-imu-filter-madgwick 
+    ```
 
 2. 导入lingao_bringup, lingao_msgs， imu_calib包到工作空间
     首先进入工作目录
