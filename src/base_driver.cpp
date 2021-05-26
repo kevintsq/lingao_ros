@@ -167,15 +167,18 @@ void Base_Driver::base_Loop()
   while (ros::ok())
   {
 
+    //判断串口是否正常开启
     if(serial->isOpen() == false)
     {
       ROS_ERROR("Serial closes unexpectedly!");
       return;
     }
 
+    //发送读取请求，并且等待数据读取，读取成功返回true
     isRead = stream->get_Message(MSG_ID_GET_VOLTAGE);
     if(isRead)
     {
+      //成功读取后数据处理
       rxData_battery = stream->get_data_battery();
       bat_msg.voltage = rxData_battery.bat_voltage;
       bat_msg.percentage = rxData_battery.bat_percentage;
