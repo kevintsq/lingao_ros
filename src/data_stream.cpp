@@ -56,9 +56,9 @@ bool Data_Stream::search_Head(unsigned char data)
         break;
 
     case DATA_RECEIVE_LENGHT:
-            Receive_State = DATA_RECEIVE_MSG_ID;
-            rx_Head.data_length = data;
-            return true;
+        Receive_State = DATA_RECEIVE_MSG_ID;
+        rx_Head.data_length = data;
+        return true;
         break;
 
     case DATA_RECEIVE_MSG_ID:
@@ -84,16 +84,23 @@ void Data_Stream::rxdata_parsing(vecBuff newdata)
         {
             if(read_buffer.empty() == false)
             {
-                unsigned int i=0;
-                if(Receive_State == DATA_RECEIVE_LENGHT) i =1;
+                //DEBUG
+                // printf("buff:  ");
+                // for(auto aa : read_buffer)
+                //         printf("%02x ", (unsigned char)aa);
+                // std::cout << std::endl;
 
-                for(; i<read_buffer.size(); i++)
+                unsigned int byte_pos=0;
+                if(Receive_State == DATA_RECEIVE_LENGHT) byte_pos =2;
+                if(Receive_State == DATA_RECEIVE_MSG_ID)  byte_pos =3;
+
+                for(; byte_pos<read_buffer.size(); byte_pos++)
                 {
-                    search_Head((unsigned char)read_buffer[i]);
-                    if(Receive_State == DATA_RECEIVE_LENGHT && i!=1)
+                    search_Head((unsigned char)read_buffer[byte_pos]);
+                    if(Receive_State == DATA_RECEIVE_LENGHT && byte_pos!=1)
                     {
-                        read_buffer.erase(read_buffer.begin(), read_buffer.begin()+i-1);
-                        i = 1;
+                        read_buffer.erase(read_buffer.begin(), read_buffer.begin()+byte_pos-1);
+                        byte_pos = 1;
                     }
                     else if(Receive_State == DATA_RECEIVE_DATA)break;
                 }
@@ -104,7 +111,10 @@ void Data_Stream::rxdata_parsing(vecBuff newdata)
                 }
                 else if(Receive_State == DATA_RECEIVE_FIND_HEAD2)
                 {
-                    read_buffer.erase(read_buffer.begin(), read_buffer.end()-1);
+                    if (read_buffer.size() > 10)
+                    {
+                        read_buffer.erase(read_buffer.begin(), read_buffer.end()-1);
+                    }
                     Receive_State = DATA_RECEIVE_FIND_HEAD1;
                 }
             }
@@ -129,7 +139,8 @@ void Data_Stream::rxdata_parsing(vecBuff newdata)
 
                     read_buffer.erase(read_buffer.begin(), read_buffer.begin()+endData+1);
                 }
-                else read_buffer.erase(read_buffer.begin(), read_buffer.begin()+2);
+                else 
+                    read_buffer.erase(read_buffer.begin(), read_buffer.begin()+2);
 
                 Receive_State = DATA_RECEIVE_FIND_HEAD1;
             }
@@ -176,7 +187,8 @@ void Data_Stream::data_undecode(MessageFormat_st msgData)
         break;
     
     default:
-        break;
+        std::cout << "[ WARN ] unknow Received data" << std::endl;
+        return;
     }
     if(check == false)
     {
@@ -247,6 +259,12 @@ bool Data_Stream::msg_Transmit(MessageFormat_st msgf)
 
     vecBuff data((unsigned char*)&msgf, (unsigned char*)&msgf+ 4+ msgf.head.data_length);
     trans->writeData(data);
+
+            //DEBUG
+        //     printf("send:  ");
+        // for(auto aa : data)
+        //         printf("%02x ", (unsigned char)aa);
+        // std::cout << std::endl;
 
     return true;
 }

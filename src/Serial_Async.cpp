@@ -54,6 +54,20 @@ bool Serial_Async::init()
         return false;
       }
 
+#if defined(__linux__)
+        // Enable low latency mode on Linux
+        {
+                int fd = port_->native_handle();
+
+                struct serial_struct ser_info;
+                ioctl(fd, TIOCGSERIAL, &ser_info);
+
+                ser_info.flags |= ASYNC_LOW_LATENCY;
+
+                ioctl(fd, TIOCSSERIAL, &ser_info);
+        }
+ #endif
+
     port_->set_option(boost::asio::serial_port::baud_rate(serial_baud_rate)); //设置波特率
     port_->set_option(boost::asio::serial_port::flow_control(boost::asio::serial_port::flow_control::none));  //设置流控制
     port_->set_option(boost::asio::serial_port::parity(boost::asio::serial_port::parity::none));  //设置奇偶校验
@@ -136,7 +150,8 @@ void Serial_Async::handle_read(const boost::system::error_code& error,  size_t b
         vecBuff data(async_read_buffer_.begin(), async_read_buffer_.begin() + bytes_transferred);
         queue_read_buffer_.push(data);
 
-        // //DEBUG
+        //DEBUG
+        // printf("rece:  ");
         // for(auto aa : data)
         //         printf("%02x ", (unsigned char)aa);
         // std::cout << std::endl;
