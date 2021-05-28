@@ -54,25 +54,36 @@ bool Serial_Async::init()
         return false;
       }
 
-#if defined(__linux__)
-        // Enable low latency mode on Linux
-        {
-                int fd = port_->native_handle();
-
-                struct serial_struct ser_info;
-                ioctl(fd, TIOCGSERIAL, &ser_info);
-
-                ser_info.flags |= ASYNC_LOW_LATENCY;
-
-                ioctl(fd, TIOCSSERIAL, &ser_info);
-        }
- #endif
-
     port_->set_option(boost::asio::serial_port::baud_rate(serial_baud_rate)); //设置波特率
     port_->set_option(boost::asio::serial_port::flow_control(boost::asio::serial_port::flow_control::none));  //设置流控制
     port_->set_option(boost::asio::serial_port::parity(boost::asio::serial_port::parity::none));  //设置奇偶校验
     port_->set_option(boost::asio::serial_port::stop_bits(boost::asio::serial_port::stop_bits::one)); //设置停止位
     port_->set_option(boost::asio::serial_port::character_size(8)); //设置数据位
+
+
+    int fd = port_->native_handle();
+    termios tio_raw;
+    tcgetattr(fd, &tio_raw);
+
+    // Set serial port to "raw" mode to prevent EOF exit.
+    cfmakeraw(&tio_raw);
+
+    // Commit settings
+    tcsetattr(fd, TCSANOW, &tio_raw);
+
+#if defined(__linux__)
+    // Enable low latency mode on Linux
+    {
+            int fd = port_->native_handle();
+
+            struct serial_struct ser_info;
+            ioctl(fd, TIOCGSERIAL, &ser_info);
+
+            ser_info.flags |= ASYNC_LOW_LATENCY;
+
+            ioctl(fd, TIOCSSERIAL, &ser_info);
+    }
+ #endif
 
   }
   catch(const std::exception& e)
