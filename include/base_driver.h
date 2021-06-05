@@ -16,6 +16,8 @@
 using namespace std;
 class Data_Stream;
 class Serial_Async;
+class TCP_Async;
+class UDP_Async;
 
 class Base_Driver
 {
@@ -24,7 +26,8 @@ public:
     void base_Loop();
 
 private:
-
+    boost::shared_ptr<TCP_Async> tcp;
+    boost::shared_ptr<UDP_Async> udp;
     boost::shared_ptr<Serial_Async> serial;
     Data_Stream *stream;
 

@@ -9,6 +9,8 @@
 #include "base_driver.h"
 #include "data_stream.h"
 #include "Serial_Async.h"
+#include "TCP_Async.h"
+#include "UDP_Async.h"
 
 // #include <linux/delay.h>
 
@@ -22,8 +24,24 @@ Base_Driver::Base_Driver() : nh_("~")
 {
   InitParams();
 
-  serial = boost::make_shared<Serial_Async>();
-  stream = new Data_Stream(serial.get());
+  // serial = boost::make_shared<Serial_Async>();
+  // stream = new Data_Stream(serial.get());
+
+  // tcp = boost::make_shared<TCP_Async>();
+  // stream = new Data_Stream(tcp.get());
+  // if (tcp->init("127.0.0.1", 38000))
+  // {
+  //   ROS_INFO_STREAM("Main board TCP Socket open success, ip= ");
+  // }
+
+    // udp = boost::make_shared<UDP_Async>();
+    // stream = new Data_Stream(udp.get());
+    // if (udp->init("10.0.0.169", 38000))
+    // {
+    //   ROS_INFO_STREAM("Main board TCP Socket open success, ip= ");
+    // }
+  
+
 
   if(serial->init(serial_port_, serial_baud_rate))
   {
@@ -166,13 +184,13 @@ void Base_Driver::base_Loop()
   ros::Rate loop_rate(loop_rate_); //HZ
   while (ros::ok())
   {
-
+    
     //判断串口是否正常开启
-    if(serial->isOpen() == false)
-    {
-      ROS_ERROR("Serial closes unexpectedly!");
-      return;
-    }
+    // if(serial->isOpen() == false)
+    // {
+    //   ROS_ERROR("Serial closes unexpectedly!");
+    //   return;
+    // }
 
     //发送读取请求，并且等待数据读取，读取成功返回true
     isRead = stream->get_Message(MSG_ID_GET_VOLTAGE);
