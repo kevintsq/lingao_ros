@@ -24,8 +24,8 @@ Base_Driver::Base_Driver() : nh_("~")
 {
   InitParams();
 
-  // serial = boost::make_shared<Serial_Async>();
-  // stream = new Data_Stream(serial.get());
+  serial = boost::make_shared<Serial_Async>();
+  stream = new Data_Stream(serial.get());
 
   // tcp = boost::make_shared<TCP_Async>();
   // stream = new Data_Stream(tcp.get());

@@ -20,8 +20,11 @@
 
 UDP_Async::UDP_Async() : m_endpoint(boost::asio::ip::address::from_string("192.168.10.100"), 38000)
 {
-  io_sev_ = boost::make_shared<boost::asio::io_service>();
-
+#if BOOST_VERSION >= 107000
+    io_sev_ = boost::make_shared<boost::asio::io_context>();
+#else
+    io_sev_ = boost::make_shared<boost::asio::io_service>();
+#endif
 }
 
 UDP_Async::~UDP_Async()

@@ -32,8 +32,13 @@ public:
 private:
     // boost::asio::ip::tcp::socket tcp_socket;     
     boost::shared_ptr<boost::asio::ip::tcp::socket> socket_;
-    boost::shared_ptr<boost::asio::io_service> io_sev_;
     boost::asio::ip::tcp::endpoint m_endpoint;
+
+#if BOOST_VERSION >= 107000
+  boost::shared_ptr<boost::asio::io_context> io_sev_;
+#else
+  boost::shared_ptr<boost::asio::io_service> io_sev_;
+#endif
 
     //Async Read Buff
     vecBuff async_read_buffer_;

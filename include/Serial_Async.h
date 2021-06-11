@@ -19,25 +19,12 @@ typedef std::vector<unsigned char> vecBuff;
 
 static const int readBufferSize = 1024;
 
-class AsyncSerialImpl : private boost::noncopyable
-{
-  public:
-    AsyncSerialImpl() : backgroundThread(), open(false), error(false)
-    {
-    }
-
-    boost::thread backgroundThread;   ///< Thread that runs read operations
-    bool open;                        ///< True if port open
-    bool error;                       ///< Error flag
-    mutable boost::mutex errorMutex;  ///< Mutex for access to error
-
-    int fd;  ///< File descriptor for serial port
-
-    char readBuffer[1024];  ///< data being read
-
-    /// Read complete callback
-    boost::function<void(const char*, size_t)> callback;
-};
+// Ensure the correct io_service() is called based on boost version
+#if BOOST_VERSION >= 107000
+#define GET_IO_SERVICE(s) ((boost::asio::io_context&)(s).get_executor().context())
+#else
+#define GET_IO_SERVICE(s) ((s).get_io_service())
+#endif
 
 class Transmission {
 public:
@@ -80,9 +67,12 @@ public:
 
 private:
   boost::shared_ptr<boost::asio::serial_port> port_;
+  
+#if BOOST_VERSION >= 107000
+  boost::shared_ptr<boost::asio::io_context> io_sev_;
+#else
   boost::shared_ptr<boost::asio::io_service> io_sev_;
-  //boost::asio::io_service  io_service_;
-  boost::shared_ptr<AsyncSerialImpl> pimpl;
+#endif
 
   //serial port
   std::string serial_port_;

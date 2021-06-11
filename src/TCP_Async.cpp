@@ -3,7 +3,7 @@
  * @Version: V1.0
  * @Author: owen
  * @Date: 2021-05-31 10:24:26
- * @LastEditTime: 2021-06-02 19:10:12
+ * @LastEditTime: 2021-06-11 11:14:18
  * @LastEditors: owen
  * @Description: 
  * @FilePath: /lingao_ws/src/lingaoRobot/lingao_bringup/src/TCP_Async.cpp
@@ -20,8 +20,11 @@
 
 TCP_Async::TCP_Async() : m_endpoint(boost::asio::ip::address::from_string("192.168.10.100"), 38000)
 {
-  io_sev_ = boost::make_shared<boost::asio::io_service>();
-
+#if BOOST_VERSION >= 107000
+    io_sev_ = boost::make_shared<boost::asio::io_context>();
+#else
+    io_sev_ = boost::make_shared<boost::asio::io_service>();
+#endif
 }
 
 TCP_Async::~TCP_Async()
