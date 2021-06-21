@@ -50,7 +50,12 @@ bool Serial_Async::init()
   boost::system::error_code ec;
   try
   {
-    port_ = boost::make_shared<boost::asio::serial_port>(boost::ref(*io_sev_));
+
+#if BOOST_VERSION >= 107000
+        port_ = boost::make_shared<boost::asio::serial_port>(*io_sev_);
+#else
+        port_ = boost::make_shared<boost::asio::serial_port>(boost::ref(*io_sev_));
+#endif
 
     port_->open(serial_port_, ec);
     if (ec) {

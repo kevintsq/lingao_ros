@@ -3,7 +3,7 @@
  * @Version: V1.0
  * @Author: owen
  * @Date: 2021-05-31 10:24:26
- * @LastEditTime: 2021-06-05 13:49:50
+ * @LastEditTime: 2021-06-13 20:19:42
  * @LastEditors: owen
  * @Description: 
  * @FilePath: /lingao_ws/src/lingaoRobot/lingao_bringup/src/UDP_Async.cpp
@@ -53,7 +53,13 @@ bool UDP_Async::init()
     boost::system::error_code ec;
     try
     {
+
+#if BOOST_VERSION >= 107000
+        socket_ = boost::make_shared<boost::asio::ip::udp::socket>(*io_sev_);
+#else
         socket_ = boost::make_shared<boost::asio::ip::udp::socket>(boost::ref(*io_sev_));
+#endif
+
         socket_->connect(m_endpoint, ec);
 
         if (ec)
