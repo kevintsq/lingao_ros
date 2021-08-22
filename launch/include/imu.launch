@@ -4,6 +4,6 @@
     <include file="$(find lingao_bringup)/launch/include/imu/$(arg imu).launch" />
 
     <!-- Publish static transform from base_footprint to imu_link -->
-    <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_imu_link" args="0 0 0.05 1.57075 0 0  /base_link /imu_link"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_imu_link" args="0 0 0.05 0 0 0  /base_link /imu_link"/>
 
 </launch>
