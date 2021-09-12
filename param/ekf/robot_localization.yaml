@@ -17,7 +17,7 @@ odom0_config: [false, false, false,
                false, false, true,
                false, false, false]
 
-odom0_differential: true  # Infer velocity from position, and fuse that velocity instead
+odom0_differential: false  # Infer velocity from position, and fuse that velocity instead
 odom0_relative: false     # Readings from the sensor will be fused relative to the first measurement
 
 imu0: /imu/data
@@ -28,11 +28,11 @@ imu0: /imu/data
 imu0_config: [false, false, false,
               false, false, true,
               false, false, false,
-              false, false, true,
+              false, false, false,
               false, false, false]
 
-imu0_differential: true
-imu0_relative: true
+imu0_differential: false
+imu0_relative: false
 
 odom_frame: odom
 base_link_frame: base_footprint
