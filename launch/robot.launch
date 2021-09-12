@@ -1,10 +1,13 @@
 <launch>
 
+    <!-- args-->
+    <arg name="use_lidar" default="true" />
+
     <!-- Start lingao bringup and IMU Filter -->
     <include file="$(find lingao_bringup)/launch/bringup.launch" />
 
     <!-- Lidar Relay -->
-    <include file="$(find lingao_bringup)/launch/include/lidar_laser.launch" />
+    <include if="$(eval use_lidar == 'true')" file="$(find lingao_bringup)/launch/include/lidar_laser.launch" />
 
     <include file="$(find lingao_description)/launch/model.launch"/>
     
