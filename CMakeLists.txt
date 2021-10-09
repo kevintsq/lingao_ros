@@ -142,12 +142,12 @@ include_directories(
 #   src/${PROJECT_NAME}/simple_follower.cpp
 # )
 
-add_library(lingao_base src/lingao_base.cpp
-                        src/base_driver.cpp
-                        src/Serial_Async.cpp
-                        src/data_stream.cpp
-                        src/TCP_Async.cpp
-                        src/UDP_Async.cpp
+add_library(lingao_base 
+  src/base_driver.cpp
+  src/Serial_Async.cpp
+  src/data_stream.cpp
+  src/TCP_Async.cpp
+  src/UDP_Async.cpp
   )
 
 ## Declare a C++ executable

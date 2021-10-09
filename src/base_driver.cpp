@@ -27,22 +27,6 @@ Base_Driver::Base_Driver() : nh_("~")
   serial = boost::make_shared<Serial_Async>();
   stream = new Data_Stream(serial.get());
 
-  // tcp = boost::make_shared<TCP_Async>();
-  // stream = new Data_Stream(tcp.get());
-  // if (tcp->init("127.0.0.1", 38000))
-  // {
-  //   ROS_INFO_STREAM("Main board TCP Socket open success, ip= ");
-  // }
-
-    // udp = boost::make_shared<UDP_Async>();
-    // stream = new Data_Stream(udp.get());
-    // if (udp->init("10.0.0.169", 38000))
-    // {
-    //   ROS_INFO_STREAM("Main board TCP Socket open success, ip= ");
-    // }
-  
-
-
   if(serial->init(serial_port_, serial_baud_rate))
   {
     ROS_INFO_STREAM("Main board Serial Port open success, com_port_name= " << serial_port_);
@@ -63,23 +47,28 @@ Base_Driver::Base_Driver() : nh_("~")
 
 void Base_Driver::InitParams()
 {
-  //serial Port
-  nh_.param("port",serial_port_, std::string("/dev/lingao"));
+  // Serial Port Params
+  nh_.param("port_name",serial_port_, std::string("/dev/lingao"));
   nh_.param("baud",serial_baud_rate, 115200);
-
-  //topic
-  nh_.param("topic_cmd_vel",topic_cmd_vel_, std::string("/cmd_vel"));
-  nh_.param("topic_odom",topic_odom_, std::string("/raw_odom"));
-  nh_.param("topic_imu",topic_imu_, std::string("/raw_imu"));
-  nh_.param("imu_frame_id", imu_frame_id_, std::string("imu_link"));
   nh_.param("freq",loop_rate_, 50);
-  
-  nh_.param("cmd_vel_sub_timeout", cmd_vel_sub_timeout_vel_, 1.0);
-  nh_.param("publish_odom", publish_odom_, false);
-  nh_.param("imu_used", imu_used, true);
 
+  // Topic Params
+  nh_.param("topic_cmd_vel_name",topic_cmd_vel_name_, std::string("/cmd_vel"));
+  nh_.param("publish_odom_name",publish_odom_name_, std::string("/raw_odom"));
+  nh_.param("odom_frame", odom_frame_, std::string("odom"));
+  nh_.param("base_frame", base_frame_, std::string("base_footprint"));
+  nh_.param("cmd_vel_sub_timeout", cmd_vel_sub_timeout_vel_, 1.0);
+  nh_.param("publish_odom_transform", publish_odom_transform_, false);
+
+  // Scale Params
   nh_.param("linear_scale", linear_scale_, 1.0);
   nh_.param("angular_scale", angular_scale_, 1.0);
+
+  // IMU Params
+  nh_.param("topic_imu",topic_imu_, std::string("/raw_imu"));
+  nh_.param("imu_frame_id", imu_frame_id_, std::string("imu_link"));
+  nh_.param("imu_used", imu_used, true);
+
 }
 
 void Base_Driver::init_imu()
@@ -99,20 +88,20 @@ void Base_Driver::init_sensor_msg()
 
 void Base_Driver::init_odom()
 {
-  ROS_INFO_STREAM("advertise to the odom topic on ["<< topic_odom_ << "]");
-  pub_odom_     = nh_.advertise<nav_msgs::Odometry>(topic_odom_, 50);
+  ROS_INFO_STREAM("advertise to the odom topic on ["<< publish_odom_name_ << "]");
+  pub_odom_     = nh_.advertise<nav_msgs::Odometry>(publish_odom_name_, 50);
 
-  ROS_INFO_STREAM("subscribe to the cmd topic on ["<< topic_cmd_vel_ << "]");
-  sub_cmd_vel_  = nh_.subscribe(topic_cmd_vel_, 50, &Base_Driver::cmd_vel_CallBack, this);
+  ROS_INFO_STREAM("subscribe to the cmd topic on ["<< topic_cmd_vel_name_ << "]");
+  sub_cmd_vel_  = nh_.subscribe(topic_cmd_vel_name_, 50, &Base_Driver::cmd_vel_CallBack, this);
 
   // 初始化odom_trans
-  odom_trans.header.frame_id = "odom";
-  odom_trans.child_frame_id = "base_footprint";
-  odom_trans.transform.translation.z = 0.0;
+  odom_tf.header.frame_id = odom_frame_;
+  odom_tf.child_frame_id = base_frame_;
+  odom_tf.transform.translation.z = 0.0;
 
   //初始化odom 里程计消息
-  odom_msg.header.frame_id = "odom";
-  odom_msg.child_frame_id = "base_footprint";
+  odom_msg.header.frame_id = odom_frame_;
+  odom_msg.child_frame_id = base_frame_;
   odom_msg.pose.pose.position.z = 0.0;
 
   setCovariance(false);
@@ -186,11 +175,11 @@ void Base_Driver::base_Loop()
   {
     
     //判断串口是否正常开启
-    // if(serial->isOpen() == false)
-    // {
-    //   ROS_ERROR("Serial closes unexpectedly!");
-    //   return;
-    // }
+    if(serial->isOpen() == false)
+    {
+      ROS_ERROR("Serial closes unexpectedly!");
+      return;
+    }
 
     //发送读取请求，并且等待数据读取，读取成功返回true
     isRead = stream->get_Message(MSG_ID_GET_VOLTAGE);
@@ -272,27 +261,29 @@ void Base_Driver::publish_odom()
   odom_quat.setRPY(0,0,th_);
   
   // 发布TF
-  if (publish_odom_)
+  if (publish_odom_transform_)
   {
     //robot's position in x,y, and z
-    odom_trans.transform.translation.x = x_pos_;
-    odom_trans.transform.translation.y = y_pos_;
+    odom_tf.transform.translation.x = x_pos_;
+    odom_tf.transform.translation.y = y_pos_;
+    odom_tf.transform.translation.z = 0.0;
 
     //robot's heading in quaternion
-    odom_trans.transform.rotation.x = odom_quat.x();
-    odom_trans.transform.rotation.y = odom_quat.y();
-    odom_trans.transform.rotation.z = odom_quat.z();
-    odom_trans.transform.rotation.w = odom_quat.w();
+    odom_tf.transform.rotation.x = odom_quat.x();
+    odom_tf.transform.rotation.y = odom_quat.y();
+    odom_tf.transform.rotation.z = odom_quat.z();
+    odom_tf.transform.rotation.w = odom_quat.w();
     
-    odom_trans.header.stamp = current_time;
+    odom_tf.header.stamp = current_time;
     //使用odom_trans对象发布机器人的tf
-    odom_broadcaster_.sendTransform(odom_trans);
+    odom_broadcaster_.sendTransform(odom_tf);
   }
 
   //发布里程计消息
   odom_msg.header.stamp = current_time;
   odom_msg.pose.pose.position.x = x_pos_;
   odom_msg.pose.pose.position.y = y_pos_;
+  odom_msg.pose.pose.position.z = 0.0;
 
   //四元数机器人的航向
   odom_msg.pose.pose.orientation.x = odom_quat.x();

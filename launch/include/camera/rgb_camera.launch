@@ -26,7 +26,7 @@
 
         <param name="auto_exposure" value="3"/> <!-- use aperture_priority auto exposure -->
         <!-- <param name="auto_white_balance" value="false"/> -->
-        <remap from="/image_raw" to="/camera/rgb/image_raw" />
+        <remap from="image_raw" to="rgb/image_raw" />
       </node>
   </group>
 </launch>

@@ -45,18 +45,20 @@ private:    //ODOM
     ros::Publisher pub_odom_;
     ros::Time last_odom_vel_time_;
     ros::Time current_time;
-    std::string topic_odom_;
+    std::string publish_odom_name_;
+    std::string odom_frame_;
+    std::string base_frame_;
     nav_msgs::Odometry odom_msg;
     Data_Format_Liner liner_rx_;
 
     tf2_ros::TransformBroadcaster odom_broadcaster_;
-    geometry_msgs::TransformStamped odom_trans;
+    geometry_msgs::TransformStamped odom_tf;
 
     double x_pos_;
     double y_pos_;
     double th_;
     int loop_rate_;
-    bool publish_odom_;
+    bool publish_odom_transform_;
 
     void init_odom();
     void calc_odom();
@@ -75,7 +77,7 @@ private:    //IMU
     void publish_imu();
 
 private:    //Update speed to board
-    std::string topic_cmd_vel_;
+    std::string topic_cmd_vel_name_;
     Data_Format_Liner liner_tx_;
     double cmd_vel_sub_timeout_vel_;
     ros::Timer cmd_vel_cb_timer;
