@@ -49,7 +49,7 @@ void Base_Driver::InitParams()
 {
   // Serial Port Params
   nh_.param("port_name",serial_port_, std::string("/dev/lingao"));
-  nh_.param("baud",serial_baud_rate, 115200);
+  nh_.param("port_baud",serial_baud_rate, 115200);
   nh_.param("freq",loop_rate_, 50);
 
   // Topic Params

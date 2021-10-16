@@ -3,8 +3,8 @@
 
     <!-- lingao base_driver -->
     <node pkg="lingao_bringup" name="lingao_base_node" type="lingao_base_node" output="screen">
-        <param name="port" value="/dev/lingao"/>
-        <param name="baud" value="230400"/>
+        <param name="port_port" value="/dev/lingao"/>
+        <param name="port_baud" value="230400"/>
         <param name="freq" value="100" />
         
         <param name="cmd_vel_sub_timeout" value="1" />
