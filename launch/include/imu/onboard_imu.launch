@@ -15,8 +15,9 @@
         <param name="use_magnetic_field_msg" value="false" /> 
         <param name="world_frame" value="enu" />
         <param name="orientation_stddev" value="0.1" />
-        <param name="angular_scale" value="1" />
         <param name="publish_debug_topics" value="false" />
+
+        <remap from="imu/data_raw" to="/imu/data_raw_calib" />
     </node>
         
     <!-- Publish static transform from base_footprint to imu_link -->

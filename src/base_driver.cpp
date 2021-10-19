@@ -12,10 +12,6 @@
 #include "TCP_Async.h"
 #include "UDP_Async.h"
 
-// #include <linux/delay.h>
-
-//test
-#include <stdio.h>
 
 using namespace std;
 
@@ -65,7 +61,7 @@ void Base_Driver::InitParams()
   nh_.param("angular_scale", angular_scale_, 1.0);
 
   // IMU Params
-  nh_.param("topic_imu",topic_imu_, std::string("/raw_imu"));
+  nh_.param("topic_imu",topic_imu_, std::string("/imu/data_raw"));
   nh_.param("imu_frame_id", imu_frame_id_, std::string("imu_link"));
   nh_.param("imu_used", imu_used, true);
 
@@ -75,8 +71,21 @@ void Base_Driver::init_imu()
 {
   if (imu_used)
   {
-    pub_imu_ = nh_.advertise<lingao_msgs::Imu>(topic_imu_, 50);
-  // imu_msg.header.frame_id = imu_frame_id_;
+    pub_imu_ = nh_.advertise<sensor_msgs::Imu>(topic_imu_, 50);
+    imu_msg.header.frame_id = imu_frame_id_;
+
+    //https://github.com/KristofRobot/razor_imu_9dof/blob/indigo-devel/nodes/imu_node.py
+    imu_msg.orientation_covariance[0] = 0.0025;
+    imu_msg.orientation_covariance[4] = 0.0025;
+    imu_msg.orientation_covariance[8] = 0.0025;
+    
+    imu_msg.angular_velocity_covariance[0] = 0.000001;
+    imu_msg.angular_velocity_covariance[4] = 0.000001;
+    imu_msg.angular_velocity_covariance[8] = 0.000001;
+
+    imu_msg.linear_acceleration_covariance[0] = 0.0001;
+    imu_msg.linear_acceleration_covariance[4] = 0.0001;
+    imu_msg.linear_acceleration_covariance[8] = 0.0001;
   }
 
 }
@@ -306,17 +315,13 @@ void Base_Driver::publish_odom()
 
 void Base_Driver::publish_imu()
 {
-  // imu_msg.header.stamp = ros::Time::now();
+  imu_msg.header.stamp = ros::Time::now();
   imu_msg.angular_velocity.x = imu_data.imu_angx;
   imu_msg.angular_velocity.y = imu_data.imu_angy;
   imu_msg.angular_velocity.z = imu_data.imu_angz;
-  imu_msg.linear_acceleration.x = imu_data.imu_accx;
-  imu_msg.linear_acceleration.y = imu_data.imu_accy;
-  imu_msg.linear_acceleration.z = imu_data.imu_accz;
-  // imu_msg.magnetic_field.x = 0;
-  // imu_msg.magnetic_field.y = imu_data.imu_magy;
-  // imu_msg.magnetic_field.z = imu_data.imu_magz;
-
-
+  imu_msg.linear_acceleration.x = imu_data.imu_accx * 9.80665;  // 加速度应以 m/s^2（原本是以 g 为单位）
+  imu_msg.linear_acceleration.y = imu_data.imu_accy * 9.80665;
+  imu_msg.linear_acceleration.z = imu_data.imu_accz * 9.80665;
+  
   pub_imu_.publish(imu_msg);
 }

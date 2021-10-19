@@ -6,7 +6,7 @@
 #include <geometry_msgs/Twist.h>
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
-#include <lingao_msgs/Imu.h>
+#include <sensor_msgs/Imu.h>
 #include <lingao_msgs/Battery.h>
 
 #include <stdio.h>
@@ -66,7 +66,7 @@ private:    //ODOM
 
 private:    //IMU
     ros::Publisher pub_imu_;
-    lingao_msgs::Imu imu_msg;
+    sensor_msgs::Imu imu_msg;
 
     std::string topic_imu_;
     std::string imu_frame_id_;
