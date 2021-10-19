@@ -68,7 +68,7 @@ imu/data_raw (lingap_msgs/Imu)
 /raw_odom (nav_msgs/Odometry)  
 - 基于编码器的的里程表信息
 
-/battery_state (lingao_msgs/Battery)
+/lingao_base/battery_state (sensor_msgs/BatteryState)
 - 电池电压和电量状态
 
 ## 订阅的话题

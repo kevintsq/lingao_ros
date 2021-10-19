@@ -7,7 +7,7 @@
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
 #include <sensor_msgs/Imu.h>
-#include <lingao_msgs/Battery.h>
+#include <sensor_msgs/BatteryState.h>
 
 #include <stdio.h>
 #include <string>
@@ -92,7 +92,7 @@ private:    //CAILB
 
 private:
     ros::Publisher pub_bat_;
-    lingao_msgs::Battery bat_msg;
+    sensor_msgs::BatteryState bat_msg;
     Data_Format_BAT rxData_battery;
 
     void init_sensor_msg();

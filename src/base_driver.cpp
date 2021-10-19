@@ -92,7 +92,7 @@ void Base_Driver::init_imu()
 
 void Base_Driver::init_sensor_msg()
 {
-  pub_bat_ = nh_.advertise<lingao_msgs::Battery>("/battery_state", 50);
+  pub_bat_ = nh_.advertise<sensor_msgs::BatteryState>("battery_state", 50);
 }
 
 void Base_Driver::init_odom()
@@ -196,8 +196,8 @@ void Base_Driver::base_Loop()
     {
       //成功读取后数据处理
       rxData_battery = stream->get_data_battery();
-      bat_msg.voltage = rxData_battery.bat_voltage;
-      bat_msg.percentage = rxData_battery.bat_percentage;
+      bat_msg.voltage = rxData_battery.bat_voltage /1000.0;
+      bat_msg.percentage = rxData_battery.bat_percentage / 100.0;
       pub_bat_.publish(bat_msg);
     }
     else ROS_WARN_STREAM("Get VOLTAGE Data Time Out!");
