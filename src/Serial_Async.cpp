@@ -14,9 +14,14 @@
 #include <linux/serial.h>
 #endif
 
-Serial_Async::Serial_Async():  pimpl(new AsyncSerialImpl)
+Serial_Async::Serial_Async()
 {
-  io_sev_ = boost::make_shared<boost::asio::io_service>();
+
+#if BOOST_VERSION >= 107000
+    io_sev_ = boost::make_shared<boost::asio::io_context>();
+#else
+    io_sev_ = boost::make_shared<boost::asio::io_service>();
+#endif
 //  serial_port_ = "/dev/lingao";
 //  serial_baud_rate = 115200;
 }
@@ -45,7 +50,12 @@ bool Serial_Async::init()
   boost::system::error_code ec;
   try
   {
-    port_ = boost::make_shared<boost::asio::serial_port>(boost::ref(*io_sev_));
+
+#if BOOST_VERSION >= 107000
+        port_ = boost::make_shared<boost::asio::serial_port>(*io_sev_);
+#else
+        port_ = boost::make_shared<boost::asio::serial_port>(boost::ref(*io_sev_));
+#endif
 
     port_->open(serial_port_, ec);
     if (ec) {

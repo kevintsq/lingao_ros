@@ -21,7 +21,6 @@ find_package(catkin REQUIRED COMPONENTS
     geometry_msgs 
     sensor_msgs 
     std_msgs
-    dynamic_reconfigure
 )
 
 ## System dependencies are found with CMake's conventions
@@ -91,11 +90,6 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * uncomment the "generate_dynamic_reconfigure_options" section below
 ##     and list every .cfg file to be processed
 
-generate_dynamic_reconfigure_options(
-   cfg/CalibrateAngular.cfg
-   cfg/CalibrateLinear.cfg
-)
-
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
 # generate_dynamic_reconfigure_options(
 #   cfg/DynReconf1.cfg
@@ -111,13 +105,6 @@ generate_dynamic_reconfigure_options(
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-
-#catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES simple_follower
-#  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
-#  DEPENDS system_lib
-#)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -137,36 +124,20 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-## Declare a C++ library
-# add_library(simple_follower
-#   src/${PROJECT_NAME}/simple_follower.cpp
-# )
 
-add_library(lingao_base src/lingao_base.cpp
-                        src/base_driver.cpp
-                        src/Serial_Async.cpp
-                        src/data_stream.cpp
+add_library(lingao_base_driver
+  src/base_driver.cpp
+  src/Serial_Async.cpp
+  src/data_stream.cpp
+  src/TCP_Async.cpp
+  src/UDP_Async.cpp
   )
 
-## Declare a C++ executable
-# add_executable(simple_follower_node src/simple_follower_node.cpp)
 
+# lingao base driver node
 add_executable(lingao_base_node src/lingao_base_node.cpp)
-
-## Specify libraries to link a library or executable target against
-# target_link_libraries(simple_follower_node
-#   ${catkin_LIBRARIES}
-# )
-
-target_link_libraries(lingao_base_node lingao_base ${catkin_LIBRARIES})
-
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(simple_follower ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-add_dependencies(lingao_base lingao_msgs_generate_messages_cpp)
-
+add_dependencies(lingao_base_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(lingao_base_node lingao_base_driver ${catkin_LIBRARIES})
 
 # flat_world_imu_node node
 add_executable(flat_world_imu_node src/flat_world_imu_node.cpp)
@@ -178,51 +149,4 @@ add_executable(flat_world_odom_node src/flat_world_odom_node.cpp)
 add_dependencies(flat_world_odom_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(flat_world_odom_node  ${catkin_LIBRARIES})
 
-#############
-## Install ##
-#############
-
-# all install targets should use catkin DESTINATION variables
-# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
-
-## Mark executable scripts (Python etc.) for installation
-## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-## Mark executables and/or libraries for installation
-# install(TARGETS simple_follower simple_follower_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
-
-## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
-
-#############
-## Testing ##
-#############
-
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_simple_follower.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
 

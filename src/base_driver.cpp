@@ -9,11 +9,9 @@
 #include "base_driver.h"
 #include "data_stream.h"
 #include "Serial_Async.h"
+#include "TCP_Async.h"
+#include "UDP_Async.h"
 
-// #include <linux/delay.h>
-
-//test
-#include <stdio.h>
 
 using namespace std;
 
@@ -21,6 +19,7 @@ using namespace std;
 Base_Driver::Base_Driver() : nh_("~")
 {
   InitParams();
+  active = false;
 
   serial = boost::make_shared<Serial_Async>();
   stream = new Data_Stream(serial.get());
@@ -35,66 +34,101 @@ Base_Driver::Base_Driver() : nh_("~")
     return;
   }
 
+  if (stream->version_detection())
+  {
+    Data_Format_VER version = stream->get_data_version();
+    ROS_INFO_STREAM("The version matches successfully, current version: [" << version.protocol_ver  << "]");
+    ROS_INFO_STREAM("GET Equipment Identity: " << version.equipmentIdentity);
+  }
+  else
+  {
+    Data_Format_VER version = stream->get_data_version();
+    ROS_INFO_STREAM("GET Equipment Identity: " << version.equipmentIdentity);
+    ROS_ERROR_STREAM("The driver version does not match,  Main control board driver version:[" << (int)version.protocol_ver << "] Current driver version:[" << LA_PROTOCOL_VERSION << "]");
+    return;
+  }
+  
+
   init_odom();
   init_imu();
   init_sensor_msg();
 
   liner_tx_.set(.0, .0, .0);
   cmd_vel_cb_timer = nh_.createTimer(ros::Duration(0, cmd_vel_sub_timeout_vel_), &Base_Driver::subTimeroutCallback, this, true);
+
+  active = true;
 }
 
 void Base_Driver::InitParams()
 {
-  //serial Port
-  nh_.param("port",serial_port_, std::string("/dev/lingao"));
-  nh_.param("baud",serial_baud_rate, 115200);
+  // Serial Port Params
+  nh_.param("port_name",serial_port_, std::string("/dev/lingao"));
+  nh_.param("port_baud",serial_baud_rate, 230400);
+  nh_.param("freq",loop_rate_, 100);
 
-  //topic
-  nh_.param("topic_cmd_vel",topic_cmd_vel_, std::string("/cmd_vel"));
-  nh_.param("topic_odom",topic_odom_, std::string("/raw_odom"));
-  nh_.param("topic_imu",topic_imu_, std::string("/raw_imu"));
-  nh_.param("imu_frame_id", imu_frame_id_, std::string("imu_link"));
-  nh_.param("freq",loop_rate_, 50);
-  
+  // Topic Params
+  nh_.param("topic_cmd_vel_name",topic_cmd_vel_name_, std::string("/cmd_vel"));
+  nh_.param("publish_odom_name",publish_odom_name_, std::string("/raw_odom"));
+  nh_.param("odom_frame", odom_frame_, std::string("odom"));
+  nh_.param("base_frame", base_frame_, std::string("base_footprint"));
   nh_.param("cmd_vel_sub_timeout", cmd_vel_sub_timeout_vel_, 1.0);
-  nh_.param("publish_odom", publish_odom_, false);
-  nh_.param("imu_used", imu_used, true);
+  nh_.param("publish_odom_transform", publish_odom_transform_, false);
 
+  // Scale Params
   nh_.param("linear_scale", linear_scale_, 1.0);
   nh_.param("angular_scale", angular_scale_, 1.0);
+
+  // IMU Params
+  nh_.param("topic_imu",topic_imu_, std::string("/imu/data_raw"));
+  nh_.param("imu_frame_id", imu_frame_id_, std::string("imu_link"));
+  nh_.param("imu_used", imu_used, true);
+
 }
 
 void Base_Driver::init_imu()
 {
   if (imu_used)
   {
-    pub_imu_ = nh_.advertise<lingao_msgs::Imu>(topic_imu_, 50);
-  // imu_msg.header.frame_id = imu_frame_id_;
+    pub_imu_ = nh_.advertise<sensor_msgs::Imu>(topic_imu_, 50);
+    imu_msg.header.frame_id = imu_frame_id_;
+
+    //https://github.com/KristofRobot/razor_imu_9dof/blob/indigo-devel/nodes/imu_node.py
+    imu_msg.orientation_covariance[0] = 0.0025;
+    imu_msg.orientation_covariance[4] = 0.0025;
+    imu_msg.orientation_covariance[8] = 0.0025;
+    
+    imu_msg.angular_velocity_covariance[0] = 0.000001;
+    imu_msg.angular_velocity_covariance[4] = 0.000001;
+    imu_msg.angular_velocity_covariance[8] = 0.000001;
+
+    imu_msg.linear_acceleration_covariance[0] = 0.0001;
+    imu_msg.linear_acceleration_covariance[4] = 0.0001;
+    imu_msg.linear_acceleration_covariance[8] = 0.0001;
   }
 
 }
 
 void Base_Driver::init_sensor_msg()
 {
-  pub_bat_ = nh_.advertise<lingao_msgs::Battery>("/battery_state", 50);
+  pub_bat_ = nh_.advertise<sensor_msgs::BatteryState>("battery_state", 50);
 }
 
 void Base_Driver::init_odom()
 {
-  ROS_INFO_STREAM("advertise to the odom topic on ["<< topic_odom_ << "]");
-  pub_odom_     = nh_.advertise<nav_msgs::Odometry>(topic_odom_, 50);
+  ROS_INFO_STREAM("advertise to the odom topic on ["<< publish_odom_name_ << "]");
+  pub_odom_     = nh_.advertise<nav_msgs::Odometry>(publish_odom_name_, 50);
 
-  ROS_INFO_STREAM("subscribe to the cmd topic on ["<< topic_cmd_vel_ << "]");
-  sub_cmd_vel_  = nh_.subscribe(topic_cmd_vel_, 50, &Base_Driver::cmd_vel_CallBack, this);
+  ROS_INFO_STREAM("subscribe to the cmd topic on ["<< topic_cmd_vel_name_ << "]");
+  sub_cmd_vel_  = nh_.subscribe(topic_cmd_vel_name_, 50, &Base_Driver::cmd_vel_CallBack, this);
 
   // 初始化odom_trans
-  odom_trans.header.frame_id = "odom";
-  odom_trans.child_frame_id = "base_footprint";
-  odom_trans.transform.translation.z = 0.0;
+  odom_tf.header.frame_id = odom_frame_;
+  odom_tf.child_frame_id = base_frame_;
+  odom_tf.transform.translation.z = 0.0;
 
   //初始化odom 里程计消息
-  odom_msg.header.frame_id = "odom";
-  odom_msg.child_frame_id = "base_footprint";
+  odom_msg.header.frame_id = odom_frame_;
+  odom_msg.child_frame_id = base_frame_;
   odom_msg.pose.pose.position.z = 0.0;
 
   setCovariance(false);
@@ -162,11 +196,12 @@ void Base_Driver::update_liner_speed()
 void Base_Driver::base_Loop()
 {
   bool isRead = false;
+  if(active == false)return;
 
   ros::Rate loop_rate(loop_rate_); //HZ
   while (ros::ok())
   {
-
+    
     //判断串口是否正常开启
     if(serial->isOpen() == false)
     {
@@ -180,8 +215,8 @@ void Base_Driver::base_Loop()
     {
       //成功读取后数据处理
       rxData_battery = stream->get_data_battery();
-      bat_msg.voltage = rxData_battery.bat_voltage;
-      bat_msg.percentage = rxData_battery.bat_percentage;
+      bat_msg.voltage = rxData_battery.bat_voltage /1000.0;
+      bat_msg.percentage = rxData_battery.bat_percentage / 100.0;
       pub_bat_.publish(bat_msg);
     }
     else ROS_WARN_STREAM("Get VOLTAGE Data Time Out!");
@@ -254,27 +289,29 @@ void Base_Driver::publish_odom()
   odom_quat.setRPY(0,0,th_);
   
   // 发布TF
-  if (publish_odom_)
+  if (publish_odom_transform_)
   {
     //robot's position in x,y, and z
-    odom_trans.transform.translation.x = x_pos_;
-    odom_trans.transform.translation.y = y_pos_;
+    odom_tf.transform.translation.x = x_pos_;
+    odom_tf.transform.translation.y = y_pos_;
+    odom_tf.transform.translation.z = 0.0;
 
     //robot's heading in quaternion
-    odom_trans.transform.rotation.x = odom_quat.x();
-    odom_trans.transform.rotation.y = odom_quat.y();
-    odom_trans.transform.rotation.z = odom_quat.z();
-    odom_trans.transform.rotation.w = odom_quat.w();
+    odom_tf.transform.rotation.x = odom_quat.x();
+    odom_tf.transform.rotation.y = odom_quat.y();
+    odom_tf.transform.rotation.z = odom_quat.z();
+    odom_tf.transform.rotation.w = odom_quat.w();
     
-    odom_trans.header.stamp = current_time;
+    odom_tf.header.stamp = current_time;
     //使用odom_trans对象发布机器人的tf
-    odom_broadcaster_.sendTransform(odom_trans);
+    odom_broadcaster_.sendTransform(odom_tf);
   }
 
   //发布里程计消息
   odom_msg.header.stamp = current_time;
   odom_msg.pose.pose.position.x = x_pos_;
   odom_msg.pose.pose.position.y = y_pos_;
+  odom_msg.pose.pose.position.z = 0.0;
 
   //四元数机器人的航向
   odom_msg.pose.pose.orientation.x = odom_quat.x();
@@ -297,17 +334,13 @@ void Base_Driver::publish_odom()
 
 void Base_Driver::publish_imu()
 {
-  // imu_msg.header.stamp = ros::Time::now();
+  imu_msg.header.stamp = ros::Time::now();
   imu_msg.angular_velocity.x = imu_data.imu_angx;
   imu_msg.angular_velocity.y = imu_data.imu_angy;
   imu_msg.angular_velocity.z = imu_data.imu_angz;
-  imu_msg.linear_acceleration.x = imu_data.imu_accx;
-  imu_msg.linear_acceleration.y = imu_data.imu_accy;
-  imu_msg.linear_acceleration.z = imu_data.imu_accz;
-  // imu_msg.magnetic_field.x = 0;
-  // imu_msg.magnetic_field.y = imu_data.imu_magy;
-  // imu_msg.magnetic_field.z = imu_data.imu_magz;
-
-
+  imu_msg.linear_acceleration.x = imu_data.imu_accx * 9.80665;  // 加速度应以 m/s^2（原本是以 g 为单位）
+  imu_msg.linear_acceleration.y = imu_data.imu_accy * 9.80665;
+  imu_msg.linear_acceleration.z = imu_data.imu_accz * 9.80665;
+  
   pub_imu_.publish(imu_msg);
 }

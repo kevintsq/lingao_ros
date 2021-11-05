@@ -6,8 +6,8 @@
 #include <geometry_msgs/Twist.h>
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
-#include <lingao_msgs/Imu.h>
-#include <lingao_msgs/Battery.h>
+#include <sensor_msgs/Imu.h>
+#include <sensor_msgs/BatteryState.h>
 
 #include <stdio.h>
 #include <string>
@@ -16,6 +16,8 @@
 using namespace std;
 class Data_Stream;
 class Serial_Async;
+class TCP_Async;
+class UDP_Async;
 
 class Base_Driver
 {
@@ -24,7 +26,8 @@ public:
     void base_Loop();
 
 private:
-
+    boost::shared_ptr<TCP_Async> tcp;
+    boost::shared_ptr<UDP_Async> udp;
     boost::shared_ptr<Serial_Async> serial;
     Data_Stream *stream;
 
@@ -34,6 +37,7 @@ private:
     //serial port
     std::string serial_port_;
     int serial_baud_rate;
+    bool active;
 
     void InitParams(); 
     void setCovariance(bool isMove);
@@ -42,18 +46,20 @@ private:    //ODOM
     ros::Publisher pub_odom_;
     ros::Time last_odom_vel_time_;
     ros::Time current_time;
-    std::string topic_odom_;
+    std::string publish_odom_name_;
+    std::string odom_frame_;
+    std::string base_frame_;
     nav_msgs::Odometry odom_msg;
     Data_Format_Liner liner_rx_;
 
     tf2_ros::TransformBroadcaster odom_broadcaster_;
-    geometry_msgs::TransformStamped odom_trans;
+    geometry_msgs::TransformStamped odom_tf;
 
     double x_pos_;
     double y_pos_;
     double th_;
     int loop_rate_;
-    bool publish_odom_;
+    bool publish_odom_transform_;
 
     void init_odom();
     void calc_odom();
@@ -61,7 +67,7 @@ private:    //ODOM
 
 private:    //IMU
     ros::Publisher pub_imu_;
-    lingao_msgs::Imu imu_msg;
+    sensor_msgs::Imu imu_msg;
 
     std::string topic_imu_;
     std::string imu_frame_id_;
@@ -72,7 +78,7 @@ private:    //IMU
     void publish_imu();
 
 private:    //Update speed to board
-    std::string topic_cmd_vel_;
+    std::string topic_cmd_vel_name_;
     Data_Format_Liner liner_tx_;
     double cmd_vel_sub_timeout_vel_;
     ros::Timer cmd_vel_cb_timer;
@@ -87,7 +93,7 @@ private:    //CAILB
 
 private:
     ros::Publisher pub_bat_;
-    lingao_msgs::Battery bat_msg;
+    sensor_msgs::BatteryState bat_msg;
     Data_Format_BAT rxData_battery;
 
     void init_sensor_msg();
