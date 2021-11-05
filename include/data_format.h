@@ -142,7 +142,7 @@ struct Data_Format_VER
     void EndianSwapSet(const void *src)
     {
         protocol_ver = *(unsigned char *)src;
-        FormatTools::EndianSwap(&equipmentIdentity, src+1, sizeof(equipmentIdentity), sizeof(equipmentIdentity));
+        FormatTools::EndianSwap(&equipmentIdentity, (unsigned char *)src+1, sizeof(equipmentIdentity), sizeof(equipmentIdentity));
     }
 };
 #pragma pack()  //取消指定对齐，恢复缺省对齐

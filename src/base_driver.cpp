@@ -37,7 +37,7 @@ Base_Driver::Base_Driver() : nh_("~")
   if (stream->version_detection())
   {
     Data_Format_VER version = stream->get_data_version();
-    ROS_INFO_STREAM("The version matches successfully, current version: [" << version.protocol_ver  << "]");
+    ROS_INFO_STREAM("The version matches successfully, current version: [" << (int)version.protocol_ver  << "]");
     ROS_INFO_STREAM("GET Equipment Identity: " << version.equipmentIdentity);
   }
   else

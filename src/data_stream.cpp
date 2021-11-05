@@ -228,6 +228,8 @@ bool Data_Stream::version_detection(void)
             }
         }
     }
+    lingao_version.equipmentIdentity = 0;
+    lingao_version.protocol_ver = LA_PROTOCOL_VERSION;
     return true;
     
 }
