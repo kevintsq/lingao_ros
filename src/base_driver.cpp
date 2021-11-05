@@ -19,6 +19,7 @@ using namespace std;
 Base_Driver::Base_Driver() : nh_("~")
 {
   InitParams();
+  active = false;
 
   serial = boost::make_shared<Serial_Async>();
   stream = new Data_Stream(serial.get());
@@ -33,20 +34,37 @@ Base_Driver::Base_Driver() : nh_("~")
     return;
   }
 
+  if (stream->version_detection())
+  {
+    Data_Format_VER version = stream->get_data_version();
+    ROS_INFO_STREAM("The version matches successfully, current version: [" << version.protocol_ver  << "]");
+    ROS_INFO_STREAM("GET Equipment Identity: " << version.equipmentIdentity);
+  }
+  else
+  {
+    Data_Format_VER version = stream->get_data_version();
+    ROS_INFO_STREAM("GET Equipment Identity: " << version.equipmentIdentity);
+    ROS_ERROR_STREAM("The driver version does not match,  Main control board driver version:[" << (int)version.protocol_ver << "] Current driver version:[" << LA_PROTOCOL_VERSION << "]");
+    return;
+  }
+  
+
   init_odom();
   init_imu();
   init_sensor_msg();
 
   liner_tx_.set(.0, .0, .0);
   cmd_vel_cb_timer = nh_.createTimer(ros::Duration(0, cmd_vel_sub_timeout_vel_), &Base_Driver::subTimeroutCallback, this, true);
+
+  active = true;
 }
 
 void Base_Driver::InitParams()
 {
   // Serial Port Params
   nh_.param("port_name",serial_port_, std::string("/dev/lingao"));
-  nh_.param("port_baud",serial_baud_rate, 115200);
-  nh_.param("freq",loop_rate_, 50);
+  nh_.param("port_baud",serial_baud_rate, 230400);
+  nh_.param("freq",loop_rate_, 100);
 
   // Topic Params
   nh_.param("topic_cmd_vel_name",topic_cmd_vel_name_, std::string("/cmd_vel"));
@@ -178,6 +196,7 @@ void Base_Driver::update_liner_speed()
 void Base_Driver::base_Loop()
 {
   bool isRead = false;
+  if(active == false)return;
 
   ros::Rate loop_rate(loop_rate_); //HZ
   while (ros::ok())

@@ -37,6 +37,7 @@ private:
     //serial port
     std::string serial_port_;
     int serial_baud_rate;
+    bool active;
 
     void InitParams(); 
     void setCovariance(bool isMove);

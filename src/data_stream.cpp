@@ -183,9 +183,18 @@ void Data_Stream::data_undecode(MessageFormat_st msgData)
             // memcpy(&rxDdata_imu, &msgData.data, msgData.head.data_length);
             check = true;
         }
-
         break;
-    
+
+    case MSG_ID_GET_VER:
+        if (sizeof(Data_Format_VER) == msgData.head.data_length)
+        {
+            lingao_version.EndianSwapSet(msgData.data);
+        }
+        else  lingao_version_error = true;
+
+        check = true;
+        break;
+        
     default:
         std::cout << "[ WARN ] unknow Received data" << std::endl;
         return;
@@ -202,12 +211,34 @@ void Data_Stream::data_undecode(MessageFormat_st msgData)
     }
 }
 
+bool Data_Stream::version_detection(void)
+{
+    for (size_t i = 0; i < 4; i++)
+    {
+        lingao_version_error = false;
+        if (get_Message(MSG_ID_GET_VER, 300))
+        {
+            if (lingao_version.protocol_ver == LA_PROTOCOL_VERSION && lingao_version_error == false)
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+    
+}
+
 
 bool Data_Stream::get_Message(Message_Id_Enum msgId, int timeoutMs)
 {
     bool isSend = false;
     switch (msgId)
     {
+    case MSG_ID_GET_VER:
     case MSG_ID_GET_IMU:
     case MSG_ID_GET_VELOCITY:
     case MSG_ID_GET_VOLTAGE:
@@ -267,23 +298,5 @@ bool Data_Stream::msg_Transmit(MessageFormat_st msgf)
         // std::cout << std::endl;
 
     return true;
-}
-
-Data_Format_Liner Data_Stream::get_data_liner()
-{
-    std::lock_guard<std::mutex> lock(getData_mutex_);
-    return rxData_liner;
-}
-
-Data_Format_IMU Data_Stream::get_data_imu()
-{
-    std::lock_guard<std::mutex> lock(getData_mutex_);
-    return rxDdata_imu;
-}
-
-Data_Format_BAT Data_Stream::get_data_battery()
-{
-    std::lock_guard<std::mutex> lock(getData_mutex_);
-    return rxData_battery;
 }
 

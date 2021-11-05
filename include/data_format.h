@@ -7,6 +7,7 @@
 
 #define HEAD_FLAG1 0xFE
 #define HEAD_FLAG2 0xEF
+#define LA_PROTOCOL_VERSION 21
 
 
 class FormatTools
@@ -73,7 +74,7 @@ enum Message_Id_Enum
     MSG_ID_GET_VELOCITY = 2,    //获取线速度、角速度
     MSG_ID_GET_VOLTAGE  = 3,    //获取电压，电量数据
     MSG_ID_GET_IMU = 4,         //获取IMU数据
-    
+    MSG_ID_GET_VER = 0xFF
 };
 
 
@@ -129,6 +130,19 @@ struct Data_Format_BAT
     {
         FormatTools::EndianSwap(this, src, sizeof(bat_voltage), sizeof(Data_Format_BAT));
         bat_percentage = *((char *)src + sizeof(bat_voltage));
+    }
+};
+
+//版本结构体
+struct Data_Format_VER
+{
+    unsigned char protocol_ver;    //获取协议版本号
+    uint32_t equipmentIdentity;
+
+    void EndianSwapSet(const void *src)
+    {
+        protocol_ver = *(unsigned char *)src;
+        FormatTools::EndianSwap(&equipmentIdentity, src+1, sizeof(equipmentIdentity), sizeof(equipmentIdentity));
     }
 };
 #pragma pack()  //取消指定对齐，恢复缺省对齐

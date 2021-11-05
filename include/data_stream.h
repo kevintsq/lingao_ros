@@ -26,6 +26,7 @@ class Data_Stream
 {
 public:
     Data_Stream(Transmission* _trans);
+    bool version_detection(void);
     
     void rxdata_parsing(vecBuff newdata);
     bool get_Message(Message_Id_Enum msgId, int timeoutMs = 50);
@@ -34,10 +35,6 @@ public:
     bool msg_Transmit(Message_Id_Enum msgId);
     bool msg_Transmit(MessageFormat_st msgf);
     bool msg_Transmit(Message_Id_Enum msgId, unsigned char* data, int size);
-
-    Data_Format_Liner   get_data_liner();
-    Data_Format_IMU     get_data_imu();
-    Data_Format_BAT     get_data_battery();
 
 private:
     Data_Receive_Enum Receive_State;
@@ -63,6 +60,34 @@ private:
     void data_undecode(MessageFormat_st msgData);
 
     Transmission* trans;
+
+    Data_Format_VER lingao_version;
+    bool lingao_version_error;
+
+public:
+    Data_Format_Liner get_data_liner()
+    {
+        std::lock_guard<std::mutex> lock(getData_mutex_);
+        return rxData_liner;
+    }
+
+    Data_Format_IMU get_data_imu()
+    {
+        std::lock_guard<std::mutex> lock(getData_mutex_);
+        return rxDdata_imu;
+    }
+
+    Data_Format_BAT get_data_battery()
+    {
+        std::lock_guard<std::mutex> lock(getData_mutex_);
+        return rxData_battery;
+    }
+
+    Data_Format_VER get_data_version()
+    {
+        std::lock_guard<std::mutex> lock(getData_mutex_);
+        return lingao_version;
+    }
 };
 
 #endif // LINGAO_DATA_STREAM_H
