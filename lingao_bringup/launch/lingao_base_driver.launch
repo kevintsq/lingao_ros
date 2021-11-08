@@ -1,0 +1,14 @@
+<launch>
+    <arg name="imu" default="$(optenv LINGAO_IMU onboard_imu)" doc="model type [lp_imu, onboard_imu]"/>
+
+    <!-- lingao base_driver -->
+    <include file="$(find lingao_base)/launch/lingao_base_driver.launch">
+
+        <arg  name="imu_use" value="true" if="$(eval imu == 'onboard_imu')"/>
+        <arg  name="imu_use" value="false" unless="$(eval imu == 'onboard_imu')" />
+
+        <arg name="linear_scale"           value="1.0"/>
+        <arg name="angular_scale"       value="1.0" />
+    </include>
+
+</launch>

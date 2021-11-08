@@ -1,8 +1,0 @@
-<launch>
-  <!-- Start lingao bringup and IMU Filter -->
-  <include file="$(find lingao_bringup)/launch/include/lingao_camera.launch" />
-
-  <!-- Start web video server -->
-  <node name="web_video_server" pkg="web_video_server" type="web_video_server" output="screen" />
-
-</launch>

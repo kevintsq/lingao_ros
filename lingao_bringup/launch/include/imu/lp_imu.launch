@@ -1,0 +1,9 @@
+<launch>
+    <!-- openzen IMU  Sensor-->
+    <node pkg="openzen_sensor" type="openzen_sensor_node" name="imu_node" output="screen">
+        <!-- <param name="sensor_name" value="devicefile:/dev/ttyUSB0" /> -->
+        <param name="baudrate" value="115200" />
+        <param name="frame_id" value="imu_link" />
+    </node>
+    
+</launch>

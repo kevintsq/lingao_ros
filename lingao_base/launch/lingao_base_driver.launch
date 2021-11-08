@@ -1,0 +1,34 @@
+<launch>
+
+    <!-- args-->
+    <arg name="pub_odom_tf" default="false"/>
+
+    <arg name="imu_use" default="false"/>
+    <arg name="topic_imu" default="/imu/onboard_imu" />
+
+    <arg name="linear_scale" default="1.0"/>
+    <arg name="angular_scale" default="1.0"/>
+
+    <!-- lingao base_driver -->
+    <node pkg="lingao_base" name="lingao_base_driver" type="lingao_base_node" output="screen">
+        <param name="port_name" value="/dev/lingao"/>
+        <param name="port_baud" value="230400"/>
+        <param name="freq" value="100" />
+        
+        <param name="cmd_vel_sub_timeout" value="1" />
+        <param name="topic_cmd_vel_name" value="/cmd_vel" />
+        <param name="publish_odom_name" value="/raw_odom" />
+        <param name="odom_frame_id" value="odom" />
+        <param name="base_frame_id" value="base_footprint" />
+        <param name="pub_odom_tf" value="$(arg pub_odom_tf)" />
+
+        <param  name="imu_use" value="$(arg imu_use)"/>
+        <param name="topic_imu" value="$(arg topic_imu)" />
+        <param name="imu_frame_id" value="imu_link" />
+
+        <param name="linear_scale" value="$(arg linear_scale)" />
+        <param name="angular_scale" value="$(arg angular_scale)" />
+
+    </node>
+
+</launch>

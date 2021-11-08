@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.5.1-0-g916b5db  Build Version: 1.5.7152.31018
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="lingao_description">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.000412303314231216 0.0307415626615971 0.000892733470010929"
+        rpy="0 0 0" />
+      <mass
+        value="4.12656595209083" />
+      <inertia
+        ixx="0.00902916418160679"
+        ixy="3.47319261350862E-08"
+        ixz="-8.00391058620384E-07"
+        iyy="0.0100913179598308"
+        iyz="-1.46637978596631E-07"
+        izz="0.0140969325875505" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://lingao_description/meshes/LA_4WD_LingFeng.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://lingao_description/meshes/LA_4WD_LingFeng.STL" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

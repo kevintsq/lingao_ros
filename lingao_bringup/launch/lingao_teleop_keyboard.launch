@@ -1,0 +1,15 @@
+<launch>
+
+    <!-- args -->
+    <arg name="repeat_rate" value="50.0" />
+
+    <!-- teleop node run -->
+    <node name="teleop_keybord" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen">
+        <param name="repeat_rate" value="$(arg repeat_rate)" />
+        <param name="key_timeout" value="0.6" />
+        <param name="speed" value="0.35" />
+        <param name="turn" value="0.7" />
+
+    </node>
+
+</launch>
