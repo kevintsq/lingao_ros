@@ -6,10 +6,8 @@
         <param name="inverted" type="bool" value="false"/>
         <param name="angle_compensate" type="bool" value="true"/>
         
-
         <!-- SET Rplidar A2 8K Mode -->
         <!-- <param name="scan_mode"  type="string"  value="Boost"/>  -->
 
-        <!-- <param name="min_distance"    type="double"   value="0.12"/> -->
     </node>
 </launch>
