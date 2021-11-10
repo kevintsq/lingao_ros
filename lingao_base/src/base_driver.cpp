@@ -95,9 +95,9 @@ void Base_Driver::init_imu()
         imu_msg.orientation_covariance[4] = 0.0025;
         imu_msg.orientation_covariance[8] = 0.0025;
 
-        imu_msg.angular_velocity_covariance[0] = 0.000001;
-        imu_msg.angular_velocity_covariance[4] = 0.000001;
-        imu_msg.angular_velocity_covariance[8] = 0.000001;
+        imu_msg.angular_velocity_covariance[0] = 0.000015;
+        imu_msg.angular_velocity_covariance[4] = 0.000015;
+        imu_msg.angular_velocity_covariance[8] = 0.000015;
 
         imu_msg.linear_acceleration_covariance[0] = 0.0001;
         imu_msg.linear_acceleration_covariance[4] = 0.0001;
@@ -134,31 +134,29 @@ void Base_Driver::setCovariance(bool isMove)
     {
         odom_msg.pose.covariance[0]   = 1e-3;
         odom_msg.pose.covariance[7]   = 1e-3;
-        odom_msg.pose.covariance[8]   = 0.0;
         odom_msg.pose.covariance[14]  = 1e6;
         odom_msg.pose.covariance[21]  = 1e6;
         odom_msg.pose.covariance[28]  = 1e6;
-        odom_msg.pose.covariance[35]  = 1e3;
+        odom_msg.pose.covariance[35]  = 1e-2;
+        
         odom_msg.twist.covariance[0]  = 1e-3;
         odom_msg.twist.covariance[7]  = 1e-3;
-        odom_msg.twist.covariance[8]  = 0.0;
         odom_msg.twist.covariance[14] = 1e6;
         odom_msg.twist.covariance[21] = 1e6;
         odom_msg.twist.covariance[28] = 1e6;
-        odom_msg.twist.covariance[35] = 1e3;
+        odom_msg.twist.covariance[35] = 1e-2;
     }
     else
     {
         odom_msg.pose.covariance[0]   = 1e-9;
-        odom_msg.pose.covariance[7]   = 1e-3;
-        odom_msg.pose.covariance[8]   = 1e-9;
+        odom_msg.pose.covariance[7]   = 1e-9;
         odom_msg.pose.covariance[14]  = 1e6;
         odom_msg.pose.covariance[21]  = 1e6;
         odom_msg.pose.covariance[28]  = 1e6;
         odom_msg.pose.covariance[35]  = 1e-9;
+
         odom_msg.twist.covariance[0]  = 1e-9;
-        odom_msg.twist.covariance[7]  = 1e-3;
-        odom_msg.twist.covariance[8]  = 1e-9;
+        odom_msg.twist.covariance[7]  = 1e-9;
         odom_msg.twist.covariance[14] = 1e6;
         odom_msg.twist.covariance[21] = 1e6;
         odom_msg.twist.covariance[28] = 1e6;
