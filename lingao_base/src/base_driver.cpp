@@ -52,6 +52,10 @@ Base_Driver::Base_Driver() : nh_("~")
     init_imu();
     init_sensor_msg();
 
+    x_pos_ = 0;
+    y_pos_ = 0;
+    th_ = 0;
+
     liner_tx_.set(.0, .0, .0);
     cmd_vel_cb_timer = nh_.createTimer(ros::Duration(0, cmd_vel_sub_timeout_vel_), &Base_Driver::subTimeroutCallback, this, true);
 
