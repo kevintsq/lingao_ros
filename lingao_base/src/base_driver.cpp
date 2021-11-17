@@ -212,7 +212,7 @@ void Base_Driver::base_Loop()
             bat_msg.voltage     = rxData_battery.voltage / 100.0;
             bat_msg.current     = rxData_battery.current / 100.0;
             bat_msg.percentage  = rxData_battery.percentage;
-            bat_msg.temperature = rxData_battery.temperature;
+            bat_msg.temperature = rxData_battery.temperature /10.0;
 
             pub_bat_.publish(bat_msg);
         }
