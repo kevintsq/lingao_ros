@@ -72,8 +72,8 @@ void Base_Driver::InitParams()
     // Topic Params
     nh_.param("topic_cmd_vel_name", topic_cmd_vel_name_, std::string("/cmd_vel"));
     nh_.param("publish_odom_name", publish_odom_name_, std::string("raw_odom"));
-    nh_.param("odom_frame_id_id", odom_frame_id_, std::string("odom"));
-    nh_.param("base_frame_id_id", base_frame_id_, std::string("base_footprint"));
+    nh_.param("odom_frame_id", odom_frame_id_, std::string("odom"));
+    nh_.param("base_frame_id", base_frame_id_, std::string("base_footprint"));
     nh_.param("cmd_vel_sub_timeout", cmd_vel_sub_timeout_vel_, 1.0);
     nh_.param("pub_odom_tf", publish_odom_transform_, false);
 
