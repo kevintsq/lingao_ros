@@ -218,7 +218,7 @@ bool Data_Stream::version_detection(void)
         lingao_version_error = false;
         if (get_Message(MSG_ID_GET_VER, 300))
         {
-            if (lingao_version.protocol_ver == LA_PROTOCOL_VERSION && lingao_version_error == false)
+            if ((lingao_version.protocol_ver == LA_PROTOCOL_VERSION || lingao_version.protocol_ver == 30) && lingao_version_error == false)
             {
                 return true;
             }
