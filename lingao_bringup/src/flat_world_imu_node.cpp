@@ -5,7 +5,6 @@
 
 class FlatWorldImuNode {
   public:
-    bool init() {}
 
     FlatWorldImuNode()
     {
