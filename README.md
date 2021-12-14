@@ -33,6 +33,12 @@
     $ catkin_make
     ```
 
+3. 工作空间的环境source （可选）
+    ``` linux
+    echo "source ~/lingao_ws/devel/setup.bash" >> ~/.bashrc
+    source ~/.bashrc
+    ```
+
 ## 通讯接口设置
 串口驱动可使用我们的udev识别文件或者更改工作包的驱动号从而启动串口通讯
 
@@ -42,10 +48,12 @@
 
 2. 方法二（推荐）：导入lingao设备识别符到系统
     ``` linux
-    $ source devel/setup.bash
+    $ source ~/lingao_ws/devel/setup.bash
     $ roscd lingao_base
     $ sudo cp 50-lingao.rules /etc/udev/rules.d/
     ``` 
+
+下位机通讯测试可[点击这里了解使用方式](http://www.elelab.net/rosserial-lower-computer-communication-test.html)
 
 ## ROS Package 基本用法
 下面是lingao_bringup的启动包，有下面几种（未全列出
