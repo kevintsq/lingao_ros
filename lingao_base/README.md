@@ -21,17 +21,17 @@ roslaunch lingao_base lingao_base_driver.launch
 
 # Lingao Bringup API
 ## 发布的话题
-/imu/data_raw (lingap_msgs/Imu)  
+/imu/data_raw ([sensor_msgs/Imu](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/Imu.html))  
 - 主题包括基于加速度和陀螺仪传感器的机器人姿态  
 
-/raw_odom (nav_msgs/Odometry)  
+/raw_odom ([nav_msgs/Odometry](http://docs.ros.org/en/noetic/api/nav_msgs/html/msg/Odometry.html))  
 - 基于编码器的的里程表信息
 
 /lingao_base_driver/battery_state (lingao_msgs/LingAoBmsStatus)
 - 电池电压和电量状态
 
 ## 订阅的话题
-/cmd_vel (geometry_msgs/Twist)
+/cmd_vel ([geometry_msgs/Twist](http://docs.ros.org/en/melodic/api/geometry_msgs/html/msg/Twist.html))
 - 控制机器人平移线速度(单位:m/s)和旋转角速度(单位:rad/s)
 
 ## 参数设置 - Parameters
