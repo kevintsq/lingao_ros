@@ -1,0 +1,15 @@
+<launch>
+    <!-- ISENS IMU  Sensor-->
+    <node pkg="isens_ros" type="sc_sensor_node" name="imu_node2" output="screen">
+        <param name="port_name" value="/dev/ttyUSB0" />
+        <param name="baudrate" value="115200" />
+
+        <param name="imu_frame_id" value="imu_link" />
+        <param name="sport_3d_mode" value="true" />
+
+        <!-- <remap from="imu/data" to="/imu/data" /> -->
+        <!-- <remap from="imu/mag" to="/imu/mag" /> -->
+
+    </node>
+    
+</launch>
