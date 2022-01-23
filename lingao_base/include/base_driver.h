@@ -74,6 +74,7 @@ private:    //IMU
     Data_Format_IMU imu_data;
     bool imu_use_;
     bool imu_calibrate_gyro_;
+    int imu_cailb_samples_;
 
     void init_imu();
     void publish_imu();

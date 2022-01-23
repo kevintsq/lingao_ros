@@ -25,6 +25,8 @@
         <param  name="imu_use" value="$(arg imu_use)"/>
         <param name="topic_imu" value="$(arg topic_imu)" />
         <param name="imu_frame_id" value="imu_link" />
+        <param name="imu_calibrate_gyro" value="true" />
+        <param name="imu_cailb_samples" value="300" />
 
         <param name="linear_scale" value="$(arg linear_scale)" />
         <param name="angular_scale" value="$(arg angular_scale)" />

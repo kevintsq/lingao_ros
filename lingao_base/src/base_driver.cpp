@@ -87,6 +87,8 @@ void Base_Driver::InitParams()
     nh_.param("imu_frame_id", imu_frame_id_, std::string("imu_link"));
     nh_.param("imu_use", imu_use_, true);
     nh_.param("imu_calibrate_gyro", imu_calibrate_gyro_, true);
+    nh_.param("imu_cailb_samples", imu_cailb_samples_, 300);
+    
 }
 
 void Base_Driver::init_imu()
@@ -342,7 +344,7 @@ void Base_Driver::publish_imu()
 
     if(imu_calibrate_gyro_)
     {
-        static calibrate_gyro calibGyro;
+        static calibrate_gyro calibGyro(imu_cailb_samples_);
         bool isCailb = calibGyro.calib(imu_data.angx, imu_data.angy, imu_data.angz);
         if(isCailb == false)return;
 
