@@ -1,5 +1,5 @@
 <launch>
-    <arg name="imu" default="$(optenv LINGAO_IMU onboard_imu)" doc="model type [lp_imu, onboard_imu]"/>
+    <arg name="imu" default="$(optenv LINGAO_IMU onboard_imu)" doc="model type [zen_imu, sc_imu, onboard_imu]"/>
 
     <include file="$(find lingao_bringup)/launch/include/imu/$(arg imu).launch" />
 
