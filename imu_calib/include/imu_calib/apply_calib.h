@@ -63,6 +63,7 @@ private:
   void rawImuCallback(sensor_msgs::Imu::ConstPtr raw);
 
   bool calibrate_gyros_;
+  bool calibrate_accel_;
   int gyro_calib_samples_;
   int gyro_sample_count_;
 
