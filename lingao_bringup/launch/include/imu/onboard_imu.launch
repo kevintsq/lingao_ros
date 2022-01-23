@@ -1,11 +1,11 @@
 <launch>
     <!-- IMU relay from lingao_msgs/Imu to sensor_msgs/Imu -->
-    <node pkg="imu_calib" type="apply_calib" name="apply_calib" output="screen" respawn="false">
+    <!-- <node pkg="imu_calib" type="apply_calib" name="apply_calib" output="screen" respawn="false">
         <param name="calib_file" value="$(find lingao_bringup)/param/imu/imu_calib.yaml" />
         <param name="calibrate_gyros" value="true" />
         <param name="calibrate_accel" value="false" />
         <param name="gyro_calib_samples" value="300" />
-    </node>
+    </node> -->
 
     <!-- Filter and fuse raw imu data -->
     <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter_madgwick" output="screen" respawn="false" >
@@ -18,7 +18,7 @@
         <param name="orientation_stddev" value="0.1" />
         <param name="publish_debug_topics" value="false" />
 
-        <remap from="imu/data_raw" to="/imu/data_raw" />
+        <remap from="imu/data_raw" to="/imu/onboard_imu" />
     </node>
         
     <!-- Publish static transform from base_footprint to imu_link -->

@@ -72,7 +72,8 @@ private:    //IMU
     std::string topic_imu_;
     std::string imu_frame_id_;
     Data_Format_IMU imu_data;
-    bool imu_use;
+    bool imu_use_;
+    bool imu_calibrate_gyro_;
 
     void init_imu();
     void publish_imu();

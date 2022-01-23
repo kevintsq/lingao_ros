@@ -7,6 +7,7 @@
  */
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
+#include "calibrate_gyro.h"
 #include "base_driver.h"
 #include "data_stream.h"
 #include "Serial_Async.h"
@@ -84,12 +85,13 @@ void Base_Driver::InitParams()
     // IMU Params
     nh_.param("topic_imu", topic_imu_, std::string("/imu/onboard_imu"));
     nh_.param("imu_frame_id", imu_frame_id_, std::string("imu_link"));
-    nh_.param("imu_use", imu_use, true);
+    nh_.param("imu_use", imu_use_, true);
+    nh_.param("imu_calibrate_gyro", imu_calibrate_gyro_, true);
 }
 
 void Base_Driver::init_imu()
 {
-    if (imu_use)
+    if (imu_use_)
     {
         pub_imu_                = nh_.advertise<sensor_msgs::Imu>(topic_imu_, 50);
         imu_msg.header.frame_id = imu_frame_id_;
@@ -219,7 +221,7 @@ void Base_Driver::base_Loop()
         else
             ROS_WARN_STREAM("Get VOLTAGE Data Time Out!");
 
-        if (imu_use)
+        if (imu_use_)
         {
             isRead = stream->get_Message(MSG_ID_GET_IMU);
             if (isRead)
@@ -338,9 +340,22 @@ void Base_Driver::publish_imu()
     imu_msg.linear_acceleration.y = imu_data.accy * 9.80665;
     imu_msg.linear_acceleration.z = imu_data.accz * 9.80665;
 
-    imu_msg.angular_velocity.x = imu_data.angx;
-    imu_msg.angular_velocity.y = imu_data.angy;
-    imu_msg.angular_velocity.z = imu_data.angz;
+    if(imu_calibrate_gyro_)
+    {
+        static calibrate_gyro calibGyro;
+        bool isCailb = calibGyro.calib(imu_data.angx, imu_data.angy, imu_data.angz);
+        if(isCailb == false)return;
+
+        imu_msg.angular_velocity.x = calibGyro.calib_x;
+        imu_msg.angular_velocity.y = calibGyro.calib_y;
+        imu_msg.angular_velocity.z = calibGyro.calib_z;
+    }
+    else
+    {
+        imu_msg.angular_velocity.x = imu_data.angx;
+        imu_msg.angular_velocity.y = imu_data.angy;
+        imu_msg.angular_velocity.z = imu_data.angz;
+    }
 
     tf2::Quaternion goal_quat;
     goal_quat.setRPY(imu_data.roll, imu_data.pitch, imu_data.yaw);
