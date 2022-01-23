@@ -57,7 +57,7 @@ roslaunch lingao_base lingao_base_driver.launch
     接收cmd_vel超时时间，超时后速度置0
 - ~imu_calibrate_gyro (string, default: true)  
     是否校准陀螺仪
-- ~imu_calibrate_gyro (int, default: 300)  
+- ~imu_cailb_samples (int, default: 300)  
     校准陀螺仪偏差的测量次数（越大精度会提高，相对的启动校准时间也增加）
 
     
