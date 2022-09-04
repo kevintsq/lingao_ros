@@ -64,7 +64,7 @@ bool UDP_Async::init()
 
         if (ec)
         {
-            std::cout << "<Error> TCP Socket open failed... ip_addr=" 
+            std::cout << "[ERROR] TCP Socket open failed... ip_addr=" 
                 << m_endpoint.address()<< ":" << m_endpoint.port() << ", e=" << ec.message().c_str() << std::endl;
             return false;
         }
@@ -75,7 +75,7 @@ bool UDP_Async::init()
     }
     catch(const std::exception& e)
     {
-        std::cerr << "<Error> info: " << e.what() << std::endl;
+        std::cerr << "[ERROR] info: " << e.what() << std::endl;
 
         return false;
     }
@@ -88,8 +88,8 @@ bool UDP_Async::init()
     }
     catch(const std::exception& e)
     {
-        std::cerr << "<Error> Thread Care Fail!" << std::endl;
-        std::cerr << "<Error> Error Msg: " << e.what() << std::endl;
+        std::cerr << "[ERROR] Thread Care Fail!" << std::endl;
+        std::cerr << "[ERROR] Error Msg: " << e.what() << std::endl;
         return false;
     }
 
@@ -100,7 +100,7 @@ bool UDP_Async::init()
 
 void UDP_Async::AsyncTask()
 {
-  std::cout << "[ Info ] UDP Socket Async Thread started" << std::endl;
+  std::cout << "[ INFO] UDP Socket Async Thread started" << std::endl;
   doRead();
   io_sev_->run();
 }
@@ -123,7 +123,7 @@ void UDP_Async::handle_read(const boost::system::error_code& error,  size_t byte
         if(isOpen_)
         {
             doClose();
-            std::cerr << "[ Error ] Serial closes unexpectedly,Error while reading data!" << "An error occurred:"<<error.message() << std::endl;
+            std::cerr << "[ERROR] Serial closes unexpectedly,Error while reading data!" << "An error occurred:"<<error.message() << std::endl;
             return;
         }
     }
@@ -214,8 +214,8 @@ void UDP_Async::handle_write(const boost::system::error_code& error)
     else {
         if(isOpen_)
         {
-            std::cerr << "[ Error ] Serial closes unexpectedly,Error while writing data!" << std::endl;
-            std::cerr << "[ Error ] Error Msg: " << error.message().c_str() << std::endl;
+            std::cerr << "[ERROR] Serial closes unexpectedly,Error while writing data!" << std::endl;
+            std::cerr << "[ERROR] Error Msg: " << error.message().c_str() << std::endl;
         }
         doClose();
     }

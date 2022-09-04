@@ -1,3 +1,5 @@
+This repo is forked from [`lingao_ros`](https://keaa.coding.net/public/lingaoros/lingao_ros/git/files).
+
 #  灵遨科技 - 移动机器人 ROS 软件包
 
 该存储库是灵遨ROS机器人最小软件包集  
@@ -51,7 +53,7 @@
     $ source ~/lingao_ws/devel/setup.bash
     $ roscd lingao_base
     $ sudo cp 50-lingao.rules /etc/udev/rules.d/
-    ``` 
+    ```
 
 下位机通讯测试可[点击这里了解使用方式](http://www.elelab.net/rosserial-lower-computer-communication-test.html)
 
@@ -69,7 +71,6 @@
     * angular_scale: 角速度计校准比例(default: 1.0)  
     更多配置可参考lingao_base里的README.md  
     
-  
 2. 启动bringup，IMU信息滤波并且和里程计融合，发布TF坐标
     ``` linux
     roslaunch lingao_bringup bringup.launch
@@ -109,5 +110,4 @@
     键盘控制节点默认速度值很高，请确保在开始用键盘控制机器人之前降低速度命令！随时准备好您的遥控器来接管控制。  
 
     发布错误的Twist速度消息可能使机器人以最快速度运行，你可以随时准备好您的遥控器来接管控制。
-
 

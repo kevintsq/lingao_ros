@@ -9,8 +9,10 @@
 #include <sensor_msgs/Imu.h>
 #include <lingao_msgs/LingAoBmsStatus.h>
 
-#include <stdio.h>
+#include <cstdio>
 #include <string>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #include "data_format.h"
 
 using namespace std;
@@ -24,6 +26,7 @@ class Base_Driver
 public:
     Base_Driver();
     void base_Loop();
+    ~Base_Driver();
 
 private:
     boost::shared_ptr<TCP_Async> tcp;
@@ -99,6 +102,15 @@ private:
     Data_Format_BAT rxData_battery;
 
     void init_sensor_msg();
+
+private:
+#define MAX_BUFFER_SIZE 1024
+#define ADDR "127.0.0.1"
+#define PORT 8080
+#define PI 3.14159265358979323846f
+    unsigned long long time_stamp = 0;
+    char *buffer;
+    int socket_fd = -1;
 };
 
 #endif // BASE_DRIVER_H

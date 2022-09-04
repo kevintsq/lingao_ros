@@ -63,6 +63,13 @@ Base_Driver::Base_Driver() : nh_("~")
     active = true;
 }
 
+Base_Driver::~Base_Driver() {
+    if (socket_fd >= 0) {
+        close(socket_fd);
+        delete[] buffer;
+    }
+}
+
 void Base_Driver::InitParams()
 {
     // Serial Port Params
@@ -110,6 +117,21 @@ void Base_Driver::init_imu()
         imu_msg.linear_acceleration_covariance[0] = 0.0001;
         imu_msg.linear_acceleration_covariance[4] = 0.0001;
         imu_msg.linear_acceleration_covariance[8] = 0.0001;
+
+        struct sockaddr_in socket_address;
+        socket_address.sin_family = AF_INET;
+        socket_address.sin_addr.s_addr = inet_addr(ADDR);
+        socket_address.sin_port = htons(PORT);
+        socklen_t socket_address_size = sizeof(socket_address);
+
+        if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+            perror("socket");
+        } else if (connect(socket_fd, (struct sockaddr *) &socket_address, socket_address_size) < 0) {
+            perror("connect");
+            socket_fd = -1;
+        } else {
+            buffer = new char[MAX_BUFFER_SIZE];
+        }
     }
 }
 
@@ -362,6 +384,25 @@ void Base_Driver::publish_imu()
     tf2::Quaternion goal_quat;
     goal_quat.setRPY(imu_data.roll, imu_data.pitch, imu_data.yaw);
     imu_msg.orientation = tf2::toMsg(goal_quat);
-
     pub_imu_.publish(imu_msg);
+
+    if (socket_fd != -1) {
+        int len = snprintf(buffer, MAX_BUFFER_SIZE,
+                            "{\n"
+                                "\t\"timeStamp\": %llu,\n\t\"type\": \"motion\",\n"
+                                "\t\"acceleration\": {\"x\": %6.3f, \"y\": %6.3f, \"z\": %6.3f},\n"
+                                "\t\"angularSpeed\": {\"x\": %7.3f, \"y\": %7.3f, \"z\": %7.3f},\n"
+                                "\t\"azimuth\": {\"row\": %7.3f, \"pitch\": %7.3f, \"yaw\": %7.3f}\n"
+                            "}\r\n",
+                            time_stamp++,
+                            imu_data.accx, imu_data.accy, imu_data.accz,
+                            imu_data.angx, imu_data.angy, imu_data.angz,
+                            imu_data.roll * 180 / PI, imu_data.pitch * 180 / PI, imu_data.yaw * 180 / PI);
+        if (len > MAX_BUFFER_SIZE) {
+            fprintf(stderr, "Payload is incomplete. Please increase SOCKET_BUFFER_SIZE.\n");
+        } else if (send(socket_fd, buffer, len, 0) < 0) {
+            printf("connection closed\n");
+            socket_fd = -1;
+        }
+    }
 }

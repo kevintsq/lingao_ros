@@ -59,7 +59,7 @@ bool Serial_Async::init()
 
     port_->open(serial_port_, ec);
     if (ec) {
-        std::cout << "<Error> Serial Port open failed... com_port_name="
+        std::cerr << "[ERROR] Serial Port open failed... com_port_name="
           << serial_port_ << ", e=" << ec.message().c_str() << std::endl;
         return false;
       }
@@ -98,7 +98,7 @@ bool Serial_Async::init()
   }
   catch(const std::exception& e)
   {
-    std::cerr << "<Error> info: " << e.what() << std::endl;
+    std::cerr << "[ERROR] info: " << e.what() << std::endl;
 
     return false;
   }
@@ -110,8 +110,8 @@ bool Serial_Async::init()
   }
   catch(const std::exception& e)
   {
-    std::cerr << "<Error> Thread Care Fail!" << std::endl;
-    std::cerr << "<Error> Error Msg: " << e.what() << std::endl;
+    std::cerr << "[ERROR] Thread Care Fail!" << std::endl;
+    std::cerr << "[ERROR] Error Msg: " << e.what() << std::endl;
     return false;
   }
   
@@ -122,7 +122,7 @@ bool Serial_Async::init()
 
 void Serial_Async::AsyncTask()
 {
-  std::cout << "[ Info ] Serial Port Async Thread started" << std::endl;
+  std::cout << "[ INFO] Serial Port Async Thread started" << std::endl;
   doRead();
   io_sev_->run();
 }
@@ -161,7 +161,7 @@ void Serial_Async::handle_read(const boost::system::error_code& error,  size_t b
         if(isOpen_)
         {
             doClose();
-            std::cerr << "[ Error ] Serial closes unexpectedly,Error while reading data!" << "An error occurred:"<<error.message() << std::endl;
+            std::cerr << "[ERROR] Serial closes unexpectedly,Error while reading data!" << "An error occurred:"<<error.message() << std::endl;
             return;
         }
     }
@@ -249,8 +249,8 @@ void Serial_Async::handle_write(const boost::system::error_code& error)
     else {
         if(isOpen_)
         {
-            std::cerr << "[ Error ] Serial closes unexpectedly,Error while writing data!" << std::endl;
-            std::cerr << "[ Error ] Error Msg: " << error.message().c_str() << std::endl;
+            std::cerr << "[ERROR] Serial closes unexpectedly,Error while writing data!" << std::endl;
+            std::cerr << "[ERROR] Error Msg: " << error.message().c_str() << std::endl;
         }
         doClose();
     }
